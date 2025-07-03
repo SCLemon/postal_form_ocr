@@ -1,12 +1,13 @@
 from PIL import Image
 import cv2
 import os
-import tempfile
 from openCV.openCV import detect_and_crop
 from ai import run
+from paddleOCR import paddleOCR
+
 
 # 1. 自動抓劃撥單，裁下整張區塊
-cropped_img, w, h = detect_and_crop('./openCV/open_template.png', './images/test.png')
+cropped_img, w, h = detect_and_crop('./openCV/open_template.png', './images/t.jpg', './crops/crops.png')
 if cropped_img is None:
     print("❌ 偵測失敗，無法裁切")
     exit()
@@ -30,16 +31,24 @@ regions = {
 
 results = {}
 
-with tempfile.TemporaryDirectory(prefix="cropped_regions_") as temp_dir:
-    for label, box in regions.items():
-        region_img = image.crop(box)
+temp_dir = "./cropped_regions"  # 自訂資料夾路徑
+os.makedirs(temp_dir, exist_ok=True)  # 若沒資料夾就建立
 
-        temp_path = os.path.join(temp_dir, f"{label}.png")
-        region_img.save(temp_path)
 
-        result_text = run(temp_path)
-        results[label] = result_text
+for label, box in regions.items():
+    region_img = image.crop(box)
 
-    for k, v in results.items():
-        v_no_space = v.replace(" ", "")
-        print(f"{k}: {v_no_space}")
+    # 放大解析度兩倍
+    w, h = region_img.size
+    region_img_2x = region_img.resize((w * 2, h * 2), Image.LANCZOS)
+
+    # 存到自訂資料夾
+    temp_path = os.path.join(temp_dir, f"{label}.png")
+    region_img_2x.save(temp_path)
+
+    # OCR 辨識
+    paddleOCR(temp_path)
+
+    # 若要記錄結果
+    # result_text = run(temp_path)
+    # results[label] = result_text
