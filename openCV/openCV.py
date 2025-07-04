@@ -65,3 +65,35 @@ def detect_and_crop(template_path, target_path, save_box_path=None):
     else:
         print(f"❌ 匹配點不足（目前 {len(good_matches)}）")
         return None, 0, 0
+
+
+def get_raw_stroke_mask_only(img_path, save_path=None, scale_factor=2):
+    img = cv2.imread(img_path)
+    if img is None:
+        raise FileNotFoundError(f"❌ 圖片無法讀取：{img_path}")
+
+    img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+
+    # 黑筆範圍
+    lower_black = np.array([0, 0, 0])
+    upper_black = np.array([180, 90, 90])
+
+    # 藍筆範圍
+    lower_blue = np.array([95, 120, 50])
+    upper_blue = np.array([130, 255, 255])
+
+    # 產生遮罩
+    mask_black = cv2.inRange(img_hsv, lower_black, upper_black)
+    mask_blue = cv2.inRange(img_hsv, lower_blue, upper_blue)
+    mask = cv2.bitwise_or(mask_black, mask_blue)
+
+    # 放大遮罩解析度
+    if scale_factor != 1:
+        h, w = mask.shape
+        mask = cv2.resize(mask, (w * scale_factor, h * scale_factor), interpolation=cv2.INTER_LANCZOS4)
+
+    if save_path:
+        cv2.imwrite(save_path, mask)
+        print(f"✅ 遮罩已儲存：{save_path}")
+
+    return mask

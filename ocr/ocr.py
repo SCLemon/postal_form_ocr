@@ -1,7 +1,7 @@
+
+# paddleocr
 from paddleocr import PaddleOCR
-
 ocr = PaddleOCR(use_angle_cls=True, lang='ch')
-
 def paddleOCR(url):
     result = ocr.predict(url)
 
@@ -11,3 +11,4 @@ def paddleOCR(url):
 
     print(text)
     return text
+

@@ -1,10 +1,9 @@
 from PIL import Image
 import cv2
 import os
-from openCV.openCV import detect_and_crop
-from ai import run
-from paddleOCR import paddleOCR
-
+from openCV.openCV import detect_and_crop, get_raw_stroke_mask_only
+from ocr.ocr import paddleOCR
+from llm.ai import run
 
 # 1. 自動抓劃撥單，裁下整張區塊
 cropped_img, w, h = detect_and_crop('./openCV/open_template.png', './images/t.jpg', './crops/crops.png')
@@ -33,7 +32,8 @@ results = {}
 
 temp_dir = "./cropped_regions"  # 自訂資料夾路徑
 os.makedirs(temp_dir, exist_ok=True)  # 若沒資料夾就建立
-
+filtered_dir = "./filtered"
+os.makedirs(filtered_dir, exist_ok=True)
 
 for label, box in regions.items():
     region_img = image.crop(box)
@@ -42,13 +42,18 @@ for label, box in regions.items():
     w, h = region_img.size
     region_img_2x = region_img.resize((w * 2, h * 2), Image.LANCZOS)
 
-    # 存到自訂資料夾
     temp_path = os.path.join(temp_dir, f"{label}.png")
     region_img_2x.save(temp_path)
 
-    # OCR 辨識
-    paddleOCR(temp_path)
+    # 去除虛線
+    if label == 'account' or label == 'amount':
+        get_raw_stroke_mask_only(temp_path, temp_path)
 
-    # 若要記錄結果
-    # result_text = run(temp_path)
-    # results[label] = result_text
+        result_text = run(temp_path)
+        results[label] = result_text
+        print(label, result_text)
+
+    else:
+        paddleOCR(temp_path)
+
+

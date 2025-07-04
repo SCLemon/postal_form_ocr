@@ -13,9 +13,9 @@ def load_model(model_path):
         print(f"載入模型：{model_path}")
         model = AutoModel.from_pretrained(
             model_path,
-            torch_dtype=torch.bfloat16,
+            torch_dtype=torch.float16,
             trust_remote_code=True,
-            device_map='cuda',
+            device_map='auto',
             low_cpu_mem_usage=True,
             img_context_token_id=128212
         ).eval()
@@ -26,9 +26,9 @@ def load_model(model_path):
         )
         print("模型載入完成")
 
-def run(url, model_path='./local_breeze2_3b'):
-    torch.cuda.empty_cache()
-    torch.cuda.ipc_collect()
+def run(url, model_path='./llm/local_breeze2_3b'):
+    # torch.cuda.empty_cache()
+    # torch.cuda.ipc_collect()
 
     load_model(model_path)  # 只會第一次載入，之後不會重複
 
