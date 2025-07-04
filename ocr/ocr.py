@@ -9,6 +9,5 @@ def paddleOCR(url):
     for t in result[0]['rec_texts']:
         text += t
 
-    print(text)
     return text
 

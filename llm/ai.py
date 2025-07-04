@@ -59,7 +59,7 @@ def run(url, model_path='./llm/local_breeze2_3b'):
         {"role": "system", "content": sys_prompt},
         {"role": "user", "content": [
             {"type": "image", "image_path": url},
-            {"type": "text", "text": "請判斷整張圖片的文字和數字，切記不要輸出換行符號, 其餘無需回覆。"},
+            {"type": "text", "text": "圖片中皆為數字，請判斷整張圖片的數字，切記不要輸出換行符號, 其餘無需回覆。"},
         ]},
     ]
 

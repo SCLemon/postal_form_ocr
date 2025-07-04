@@ -4,6 +4,7 @@ import os
 from openCV.openCV import detect_and_crop, get_raw_stroke_mask_only
 from ocr.ocr import paddleOCR
 from llm.ai import run
+import json
 
 # 1. 自動抓劃撥單，裁下整張區塊
 cropped_img, w, h = detect_and_crop('./openCV/open_template.png', './images/t.jpg', './crops/crops.png')
@@ -51,9 +52,12 @@ for label, box in regions.items():
 
         result_text = run(temp_path)
         results[label] = result_text
-        print(label, result_text)
 
     else:
-        paddleOCR(temp_path)
+        results[label] = paddleOCR(temp_path)
 
 
+
+cleaned_results = {k: v.replace(" ", "").replace("\n", "") for k, v in results.items()}
+json_output = json.dumps(cleaned_results, ensure_ascii=False, indent=2)
+print(json_output)
