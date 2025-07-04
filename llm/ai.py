@@ -59,7 +59,7 @@ def run(url, model_path='./llm/local_breeze2_3b'):
         {"role": "system", "content": sys_prompt},
         {"role": "user", "content": [
             {"type": "image", "image_path": url},
-            {"type": "text", "text": "圖片中皆為數字，請判斷整張圖片的數字，切記不要輸出換行符號, 其餘無需回覆。"},
+            {"type": "text", "text":  "Please return only the single continuous string of digits found in the image. Do not include any other text, punctuation, or newline characters."},
         ]},
     ]
 
