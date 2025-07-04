@@ -13,7 +13,7 @@ def load_model(model_path):
         print(f"載入模型：{model_path}")
         model = AutoModel.from_pretrained(
             model_path,
-            torch_dtype=torch.float16,
+            torch_dtype=torch.bfloat16,
             trust_remote_code=True,
             device_map='auto',
             low_cpu_mem_usage=True,
